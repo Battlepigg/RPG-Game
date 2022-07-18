@@ -198,10 +198,11 @@ class Shadow(Hero):
 class Medic(Hero):
     def attack(self, enemy):
         super().attack(enemy)
-        prob = random.randint(1,10)
-        if prob <= 2:
-            self.health = self.health + 2
-            print("The medic healed himself")
+        if self.health < self.max_health:
+            prob = random.randint(1,10)
+            if prob <= 2:
+                self.health = self.health + 2
+                print("The medic healed himself")
 
 class Wizard(Hero):
     pass
