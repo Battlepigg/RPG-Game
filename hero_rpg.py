@@ -1,79 +1,88 @@
-# In this simple RPG game, the hero fights the goblin. He has the options to:
+'''
+TODO
+    add armor to store
+    add evade variable
+    make swap potion
+    add stuff to the store
+    balance health, power of all characters
+    make the fucking thing not run twice
+    
+    OPTIONAL
+    add sell functionality
+    make swap potion
+    make enemies drop items as well as gold
 
-# 1. fight goblin
-# 2. do nothing - in which case the goblin will attack him anyway
-# 3. flee
 
-class Character:
-    def __init__(self, health, power):
-        # self.name = name
-        self.health = health
-        self.power = power
 
-    def attack(self, enemy):
-        enemy.health -= self.power
-        print(f"The {type(self).__name__} does {self.power} damage to the {type(enemy).__name__}.")
-        if enemy.health <= 0:
-            print(f"The {type(enemy).__name__} is dead.")
+'''
 
-    def alive(self):
-        return self.health > 0
+from characters import *
+from items import *
 
-    def print_status(self):
-        print(f"The {type(self).__name__} has {self.health} health and {self.power} power.")
+def bar(_hero):
+    while True:
+        picker = int(input("""
+            Welcome to the Bar!
+            ======================
+            What do you want to do?
+            1. Get a drink (heal)
+            2. Talk to the locals
+            5. Exit bar\n> """)
+        )
+        if picker == 1:
+            _hero.health = _hero.max_health
+            print(f"Your health has been healed to {_hero.health}")
 
-class Hero(Character):
-    pass
+        elif picker == 2:
+            pass
 
-class Goblin(Character):
-    pass
-
-class Zombie(Character):
-    pass
+        elif picker == 5:
+            print("Thanks for visiting!")
+            break
 
 def main():
-    hero = Hero(10, 5)
-    goblin = Goblin(6, 2)
-    zombie = Zombie(100, 1)
-    # hero.health = 10
-    # hero.power = 5
-    # goblin.health = 6
-    # goblin.power = 2
+    '''Main execution'''
 
-    while goblin.alive() and hero.alive():
-        hero.print_status()
-        goblin.print_status()
-        # print(f"You have {hero.health} health and {hero.power} power.")
-        # print(f"The goblin has {goblin.health} health and {goblin.power} power.")
-        print()
-        print("What do you want to do?")
-        print("1. fight goblin")
-        print("2. do nothing")
-        print("3. flee")
-        print("> ", end=' ')
-        raw_input = input()
-        if raw_input == "1":
-            hero.attack(goblin)
-            # Hero attacks goblin
-            # Goblin.health -= Hero.power
-            # print("You do {} damage to the goblin.".format(Hero.power))
-            # if Goblin.health <= 0:
-            #     print("The goblin is dead.")
-        elif raw_input == "2":
-            pass
-        elif raw_input == "3":
-            print("Goodbye.")
-            break
-        else:
-            print(f"Invalid input {raw_input}")
+    ########### DOGSHIT
+    char_list = [['Medic', 'Chance to heal Yourself.', Medic()],
+                ['Shadow', '10 chance not to get hit.', Shadow()],
+                ['Berzerker', '20 chance to deal double damage.', Berzerker()]]
 
-        if goblin.health > 0:
-            # Goblin attacks hero
-            goblin.attack(hero)
-            # hero.health -= goblin.power
-            # print("The goblin does {} damage to you.".format(goblin.power))
-            # if hero.health <= 0:
-            #     print("You are dead.")
+    idx = 1
+    print("Who would you like to play as?")
+    for char in char_list:
+        print(f"\t{idx}. {char[0]} : {char[1]}")
+        idx += 1
+    print(end='\n>')
+    res = int(input())
+    _hero = char_list[res-1][2]
+    print(f"You are a level 1 {type(_hero).__name__}")
 
-main()
+    store = Store(_hero)
+    ########### DOGSHIT
 
+    print("It is pitch black. You are likely to be eaten by a grue.")
+
+    while True:
+
+        picker = int(input("""
+            What do you want to do?
+            1. Explore
+            2. Visit the store
+            3. Visit the bar
+            4. Manage inventory
+            5. Exit game\n> """))
+        if picker == 1:
+            _hero.fight()
+        elif picker == 2:
+            store.go_shopping(_hero)
+        elif picker == 3:
+            bar(_hero)
+        elif picker == 4:
+            _hero.inventory()
+        elif picker == 5:
+            print("Thanks for playing!")
+            quit()
+
+if __name__ == "__main__":
+    main()
