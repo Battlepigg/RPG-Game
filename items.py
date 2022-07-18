@@ -12,6 +12,19 @@ class Weapon(Item):
     def __str__(self):
         return self.name
 
+class Armor(Item):
+    def __init__(self, name, price, defense, level, power):
+        self.power = power
+        self.level = level
+        self.name = name
+        self.price = price
+        self.defense = defense
+        self.equippable = False
+
+    def use(self, _hero):
+        _hero.armor += self.defense
+        print(f"Enemies now do {self.defense} less damage to you")
+
 class Potion(Item):
     def __init__(self, price, level):
         self.price = int(price)
@@ -25,9 +38,13 @@ class SuperTonic(Potion):
     def __init__(self, price, level):
         super(SuperTonic, self).__init__(price, level)
 
-    def use(self, hero):
-            hero.health = hero.max_health
-            print(f"Your health has been restored to {hero.max_health}.")
+    def use(self, _hero):
+        if _hero.health == _hero.max_health:
+            print("your health is already full!")
+        else:
+            _hero.health = _hero.max_health
+            print(f"Your health has been restored to {_hero.max_health}.")
+            _hero.inv.remove(self)
     
     def __str__(self):
         return "Super tonic"
@@ -47,15 +64,19 @@ class Store():
         self._hero = _hero
         
         self.items = [
-            Weapon('Bronze sword', 200000, 2, 1), # TODO POPULATE STORE WITH COOL SHIT
-            Weapon('Iron sword', 4, 8, 2)
+            Weapon('Iron sword', 200, 20, 2), # TODO POPULATE STORE WITH COOL STUFF
+            Weapon('Bronze sword', 10, 5, 1),
+            Armor('Iron Armor', 20, 2, 1, 0)
         ]
-    
+        
     def print_items(self):
         if self.items != []:
             print("Items for sale:")
             for item in self.items:
-                print(f"\t{item.name} - costs {item.price} gold")
+                if item.power > 0:
+                    print(f"\t{item.name} - costs {item.price} gold and does {item.power} damage")
+                else:
+                    print(f"\t{item.name} - costs {item.price} gold")
         else:
             print("The store has no items right now, come back later!")
     
@@ -69,12 +90,20 @@ class Store():
                     return
 
                 self._hero.gold -= item.price
-                self._hero.inv.append(item)
                 print(f"You bought the {item.name}.")
                 print(f"you now have {self._hero.gold} gold")
-                self.items.remove(item)
-                break
 
+                if type(item).__name__ == "Armor":
+                    item.use(self._hero)
+                    break
+                else:
+                    self.items.remove(item)
+                    self._hero.inv.append(item)
+                    if item.equippable:
+                        equip = input(f"Would you like to equip {item.name}? y/n\n>")
+                        if equip.lower == 'yes' or 'y':
+                            self._hero.equip(item)
+                    break
         else:
             print("Sorry, we don't have that in stock. Make sure you entered the item name correctly")
 
@@ -82,34 +111,31 @@ class Store():
         pass
     
     def go_shopping(self, _hero):
-        # items = Items('Store')
-        # MAYBE PRINT SOMETHING LIKE "Here is your current inventory:\n"
         self._hero.print_inventory()
         while True:
-            print("""
-                Welcome to the store
-                ====================
-                What do you want to do?
-                1. List items for sale
-                2. Buy item
-                3. Sell item
-                4. Exit Store
-                """, end='\n> ')
-            picker = int(input())
-            if picker == 1:
+            picker = input("""
+            Welcome to the store
+            ====================
+            What do you want to do?
+            1. List items for sale
+            2. Buy item
+            9. Exit Store\n> """)
+            if picker == '1':
                 self.print_items()
 
-            elif picker == 2:
+            elif picker == '2':
                 self.buy()
 
-            elif picker == 3:
+            elif picker == '3':
                 pass
 
-            elif picker == 4:
+            elif picker == '9':
                 print("\nThanks for visiting!")
                 break
+            else:
+                print("That's not a valid option")
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    tonic = SuperTonic("test", 69, "23")
-    print(vars(tonic))
+#     tonic = SuperTonic("test", 69, "23")
+#     print(vars(tonic))
